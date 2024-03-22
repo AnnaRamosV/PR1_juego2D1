@@ -4,18 +4,19 @@ using UnityEngine;
 
 public class Movpersonaje : MonoBehaviour
 {  
-    public float multVelocidad = 1;
-    //  public float multSalto = 1;
+    public float multVelocidad = 5f;
+    private Rigidbody2D rb;
+    public float multSalto = 5f;
+     private bool puedoSaltar = true;
+
    //  SpriteRenderer sr;
-   //  RigidBody2D rb;
-    
-   //  public bool puedoSaltar = false;
 
 
     // Start is called before the first frame update
     void Start() 
     {
-        //  rb = this.GetComponent<RigidBody2D> ();
+        rb = GetComponent<Rigidbody2D> ();
+        transform.position = new Vector3(-4.15f, 0.45f, 0);
         //  sr = this.GetComponent<SpriteRenderer> ();
     } 
 
@@ -23,36 +24,39 @@ public class Movpersonaje : MonoBehaviour
     void Update()
     {
         //Movimiento
-        // float mov = Input.GetAxis("Horizontal")*multVelocidad*Time.deltaTime;
-       //  transform.position = new Vector3(transform.position.x+mov, transform.position.y, transform.position.z);
-       //  transform.Translate(mov, 0, 0);
+        float movTeclas = Input.GetAxis("Horizontal"); //*multVelocidad*Time.deltaTime;
+        //float movTeclas = Input.GetAxis("Vertical"); //*multVelocidad*Time.deltaTime;
+        float miDeltaTime = Time.deltaTime;
 
-         //  if(Input.GetKeyDown(KeyCode.D)) {
-          //      sr.flipX = false;
-         //  }
+        rb.velocity = new Vector2(movTeclas*multVelocidad, rb.velocity.y);
+        
+      //FLIP
+        if(Input.GetKeyDown(KeyCode.A)){
+          this.GetComponent<SpriteRenderer>().flipX = true;
+        }else if(Input.GetKeyDown(KeyCode.D)){
+          this.GetComponent<SpriteRenderer>().flipX = false;
+        }
 
-        //Salto
+        //SALTO//
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 0.5f);
+        Debug.DrawRay(transform.position, Vector2.down, Color.magenta);
 
-         //  RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 0.4f);
-         //   if(hit){
-         //  Debug.DrawRay(transform.position, Vector2.down, Color.magenta);
-         //  if(hit.collider.name == "Grid"){
-         //       puedoSaltar = true;
-         //  }else{
-          //      puedoSaltar = false;
-          // }
+        if(hit){
+          puedoSaltar = true;
+          Debug.Log(hit.collider.name);
+        }else {
+          puedoSaltar = false;
+        }
 
-        //  if (Input.GetKeyDown(KeyCode.Space) && puedoSaltar==true) 
-        // {
-         //   rb.AddForce(new Vector2.up * multSalto, ForceMode2d.Impulse);{
-
-         //   }
-       //   }
+        if(Input.GetKeyDown(KeyCode.Space) && puedoSaltar){
+          rb.AddForce(
+            new Vector2(0,multSalto),
+            ForceMode2D.Impulse
+          );
+          puedoSaltar = false; 
+        }
     }
-     // void OnCollisionEnter2D(Collision2D col){
-       //  global::System.Object value = Debug.Log(col.gameObject.name);
-    // }
-    
-
-   
+    void OnCollisionEnter2D(){
+      puedoSaltar = true;
+    }
 }
